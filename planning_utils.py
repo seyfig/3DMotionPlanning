@@ -120,10 +120,19 @@ def a_star(grid, h, start, goal):
 
         item = queue.get()
         current_node = item[1]
+
+        if current_node in visited:
+            continue
+
+        visited.add(current_node)
+
         if current_node == start:
             current_cost = 0.0
+            current_action = None
+            action_change_cost = 0.0
         else:
             current_cost = branch[current_node][0]
+            current_action = branch[current_node][2]
         if depth % 1000 == 0:
             print(depth, depth_act, current_cost, item[0], item[1])
         if current_node == goal:
@@ -139,9 +148,16 @@ def a_star(grid, h, start, goal):
                 next_node = (current_node[0] + da[0],
                              current_node[1] + da[1]
                              )
+                #if current_action is not None:
+                #    action_change_cost = heuristic(da, current_action.delta)
                 branch_cost = current_cost + action.cost
                 h_cost = h(next_node, goal)
-                queue_cost = branch_cost + h_cost
+                queue_cost = branch_cost + h_cost + action_change_cost
+                # if action_change_cost > 3:
+                #     print("CC:%.4f, AC:%.4f, BC:%.4f, HC:%.4f, ACC:%.4f, QC:%.4f, CN:%s, NN:%s, CA:%s, A:%s" % (
+                #         current_cost, action.cost, branch_cost,
+                #         h_cost, action_change_cost, queue_cost, current_node, next_node, current_action, action))
+
                 # print("CN: ",
                 #       current_node,
                 #       "; A: ",
@@ -154,9 +170,12 @@ def a_star(grid, h, start, goal):
                 #       h_cost,
                 #       "; TC: ",
                 #       queue_cost)
-
-                if next_node not in visited:
-                    visited.add(next_node)
+                if next_node in branch:
+                    cost_in_branch = branch[next_node][0]
+                    if branch_cost < cost_in_branch:
+                        branch[next_node] = (branch_cost, current_node, action)
+                        queue.put((queue_cost, next_node))
+                else:
                     branch[next_node] = (branch_cost, current_node, action)
                     queue.put((queue_cost, next_node))
 
