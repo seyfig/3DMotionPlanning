@@ -2,7 +2,10 @@
 ![Quad Image](./misc/enroute.png)
 
 ---
-
+TODO:STEPS FROM COMMITS
+3D
+VOXEL MAP, action x 24?
+up do not work
 
 # Required Steps for a Passing Submission:
 1. Load the 2.5D map in the colliders.csv file describing the environment.

@@ -1,6 +1,6 @@
 import numpy as np
 
-def create_voxmap(data, voxel_size=5):
+def create_voxmap(data, safety_distance=5, max_altitude=None, voxel_size=5):
     """
     Returns a grid representation of a 3D configuration space
     based on given obstacle data.
@@ -16,7 +16,10 @@ def create_voxmap(data, voxel_size=5):
     east_max = np.ceil(np.amax(data[:, 1] + data[:, 4]))
 
     # maximum altitude
-    alt_max = np.ceil(np.amax(data[:, 2] + data[:, 5]))
+    if max_altitude is None:
+        alt_max = np.ceil(np.amax(data[:, 2] + data[:, 5]))
+    else:
+        alt_max = max_altitude
 
     # given the minimum and maximum coordinates we can
     # calculate the size of the grid.
@@ -33,13 +36,13 @@ def create_voxmap(data, voxel_size=5):
         # i.e. grid[0:5, 20:26, 2:7] = True
         north, east, alt, d_north, d_east, d_alt = data[i, :]
         obstacle = [
-            int(north - d_north - north_min) // voxel_size,
-            int(north + d_north - north_min) // voxel_size,
-            int(east - d_east - east_min) // voxel_size,
-            int(east + d_east - east_min) // voxel_size,
+            int(north - d_north - north_min - safety_distance) // voxel_size,
+            int(north + d_north - north_min + safety_distance) // voxel_size,
+            int(east - d_east - east_min - safety_distance) // voxel_size,
+            int(east + d_east - east_min + safety_distance) // voxel_size,
         ]
 
         height = int(alt + d_alt) // voxel_size
-        voxmap[obstacle[0]:obstacle[1], obstacle[2]:obstacle[3], 0:height] = True
+        voxmap[obstacle[0]:obstacle[1], obstacle[2]:obstacle[3], 0:height+safety_distance] = True
 
     return voxmap
