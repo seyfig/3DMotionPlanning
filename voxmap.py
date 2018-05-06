@@ -45,4 +45,4 @@ def create_voxmap(data, safety_distance=5, max_altitude=None, voxel_size=5):
         height = int(alt + d_alt) // voxel_size
         voxmap[obstacle[0]:obstacle[1], obstacle[2]:obstacle[3], 0:height+safety_distance] = True
 
-    return voxmap
+    return voxmap, int(north_min), int(east_min)
