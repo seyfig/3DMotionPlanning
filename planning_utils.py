@@ -624,11 +624,8 @@ def a_star_graph(graph, h, start, goal):
 
         if current_node == start:
             current_cost = 0.0
-            current_action = None
-            action_change_cost = 0.0
         else:
             current_cost = branch[current_node][0]
-            current_action = branch[current_node][2]
         if depth % 1000 == 0:
             print(depth, depth_act, current_cost, item[0], item[1])
         if current_node == goal:
@@ -638,17 +635,16 @@ def a_star_graph(graph, h, start, goal):
         else:
             for next_node in graph[current_node]:
                 cost = graph.edges[current_node, next_node]['weight']
-                new_cost = current_cost + cost + heuristic(next_node, goal)
+                new_cost = current_cost + cost + h(next_node, goal)
 
                 if next_node in branch:
                     cost_in_branch = branch[next_node][0]
-                    if branch_cost < cost_in_branch:
+                    if new_cost < cost_in_branch:
                         branch[next_node] = (new_cost, current_node)
                         queue.put((new_cost, next_node))
                 else:
                     branch[next_node] = (new_cost, current_node)
                     queue.put((new_cost, next_node))
-
 
     path = []
     path_cost = 0
