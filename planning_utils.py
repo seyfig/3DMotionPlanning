@@ -398,8 +398,8 @@ def a_star(grid, h, start, goal):
         else:
             current_cost = branch[current_node][0]
             current_action = branch[current_node][2]
-        if depth % 1000 == 0:
-            print(depth, depth_act, current_cost, item[0], item[1])
+        #if depth % 1000 == 0:
+        #    print(depth, depth_act, current_cost, item[0], item[1])
         if current_node == goal:
             print('Found a path.')
             found = True
@@ -413,11 +413,11 @@ def a_star(grid, h, start, goal):
                 next_node = (current_node[0] + da[0],
                              current_node[1] + da[1]
                              )
-                # if current_action is not None:
-                #    action_change_cost = heuristic(da, current_action.delta)
-                branch_cost = current_cost + action.cost
+                if current_action is not None:
+                    action_change_cost = heuristic(da, current_action.delta) / 10.0
+                branch_cost = current_cost + action.cost + action_change_cost
                 h_cost = h(next_node, goal)
-                queue_cost = branch_cost + h_cost + action_change_cost
+                queue_cost = branch_cost + h_cost
                 # if action_change_cost > 3:
                 #     print("CC:%.4f, AC:%.4f, BC:%.4f, HC:%.4f, ACC:%.4f, QC:%.4f, CN:%s, NN:%s, CA:%s, A:%s" % (
                 #         current_cost, action.cost, branch_cost,
@@ -610,6 +610,7 @@ def a_star_graph(graph, h, start, goal):
 
     depth = 0
     depth_act = 0
+    mindgoal = 999999
 
     while not queue.empty():
         depth += 1
@@ -626,6 +627,10 @@ def a_star_graph(graph, h, start, goal):
             current_cost = 0.0
         else:
             current_cost = branch[current_node][0]
+        dgoal = h(current_node, goal)
+        if dgoal < mindgoal:
+            mindgoal = dgoal
+            print(depth, depth_act, current_cost, item[0], item[1], mindgoal)
         if depth % 1000 == 0:
             print(depth, depth_act, current_cost, item[0], item[1])
         if current_node == goal:
