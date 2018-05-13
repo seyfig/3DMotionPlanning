@@ -18,49 +18,7 @@ goal:  (-122.3850218762088, 37.79512860180831, 130.09256609855177)
 lon lat: (37.79248, -122.39745)  vs  (316, 445)
 lla:  37.7914857 -122.3921666 0.082 ```(self._latitude, self._longitude, self._altitude)```
 
-    feat: Implement 3D navigation motionplot3Dvox notebook
-
-commit 2177f2879f43fc0524a8aefcd1106dab833aa7e0
-Author: seyfi <sgzbyk@gmail.com>
-Date:   Sun May 6 13:34:56 2018 +0300
-
-    feat: Add voxel_size parameter to plan faster.
-
-commit e99d5d8f8d17e079a7ed454592ef0103ebb8cfb9
-Author: seyfi <sgzbyk@gmail.com>
-Date:   Sun May 6 11:37:14 2018 +0300
-
-    feat: 3D planning with voxel map
-
-commit e884c8716d01a91e398536e09353c36389a12b73
-Author: seyfi <sgzbyk@gmail.com>
-Date:   Thu May 3 16:35:40 2018 +0300
-
-    fix: Fix zig zag in A*
-
-commit 502c8f2917bc975ae426fc9924c76311c495a8f6
-Author: seyfi <sgzbyk@gmail.com>
-Date:   Mon Apr 30 16:25:11 2018 +0300
-
-    Add pruning path to motionplot notebook
-
-commit 852616c4c0fc643e0f5c2782ba5bc2262f4b65c8
-Author: seyfi <sgzbyk@gmail.com>
-Date:   Sun Apr 29 22:40:57 2018 +0300
-
-    feat: Implement A* without pruning in motionplot notebook
-
-commit c506844fda6be60dc67d67c7736ae4479a2dabfe
-Author: seyfi <sgzbyk@gmail.com>
-Date:   Sun Apr 29 15:34:25 2018 +0300
-
-    doc: Explain motion_planning vs backyard_flyer
-
-commit 5fd186f191bd2e2638f2071487fe0b08020b8136
-Author: seyfi <sgzbyk@gmail.com>
-Date:   Fri Apr 20 17:01:19 2018 +0300
-
-    init: Clone from Udacity Repo
+GIT LOG
 
 
 
@@ -133,29 +91,18 @@ This function creates a path using the a_star algorithm. It takes the grid, heur
 Currently, the goal position is hardcoded as some location 10 m north and 10 m east of map center. There are no diagonal motions. Therefore, the planning results in one step north and one step east.
 
 
-TODO DELETE 
-These scripts contain a basic planning implementation that includes...
-
-And here's a lovely image of my results (ok this image has nothing to do with it, but it's a nice example of how to include images in your writeup!)
-![Top Down View](./misc/high_up.png)
-
-Here's | A | Snappy | Table
---- | --- | --- | ---
-1 | `highlight` | **bold** | 7.41
-2 | a | b | c
-3 | *italic* | text | 403
-4 | 2 | 3 | abcd
-
 ### Implementing Your Path Planning Algorithm (2D Grid A* algorithm)
   
 There are TODO algorithms implemented. These are
 1. 2D Grid A* Algorithm
 2. 3D Voxmap A* Algorithm
 3. TODO Graph
+4. Probabilistic Roadmap
+5. RRT
 
-TODO
-This part describes the general steps. Each algorithm has a specific part below. Each part has the steps that are changing for the algorithm.
-TODO
+To run 2D grid A* planning, there are two options. One is to run the motion_planning.py file. The possible parameters are global_goal, local_goal, grid_goal. If more than one arguments are sent, only the first one would have affect. The other option is the motionplot.ipnyb notebook.
+
+There is problem with path planning, if it takes too much time, it can't send the waypoints to the simulator.
 
 #### 1. Set your global home position
 The plan_path method reads the colliders.csv file and gets the lat0 and lon0 values. Convert these values to float, and send them to the self.set_home_position function. This function sets the global home position.
@@ -182,7 +129,7 @@ For 2D planning, the action object in the planning_utils.py file includes 4 addi
 
 In the first version of the a_star function in the planning_utils.py file, when a node can be reached with a lower cost after it was added to the branch, it is not possible to change the path for that node. In order to correct this error, the code location to add a node to the visited list is changed. A node is added to the visited list, only when it is the current node. Previously, it was added when it was the next_node. This change enabled a node to be placed in the queue more than once. It will be visited with the lowest queue cost. After it is visited, the other items in the queue, containing the same node, will be skipped without processing.
 
-Another thing to change was adding a cost for changing action, in order to prevent too many zigzag moves. However, the cost changed the behavior of the a_star planning, therefore it isn't implemented.
+Another thing to add was adding a cost for changing action. The reason is to prevent too many zigzag moves. However, this cost shall be significantly lower than the action cost (action cost / 10). Otherwise, it changes the behavior of the a_star planning.
 
 #### 6. Cull waypoints
 The collinearity_check was performed to determine whether a point in the path can be removed or not. If three points fit in the same line, then the second of them was removed.
