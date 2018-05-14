@@ -31,18 +31,17 @@ def create_grid(data, drone_altitude, safety_distance):
     for i in range(data.shape[0]):
         north, east, alt, d_north, d_east, d_alt = data[i, :]
         if alt + d_alt + safety_distance > drone_altitude:
+            bottom = north - d_north - safety_distance - north_min
+            top = north + d_north + safety_distance - north_min
+            left = east - d_east - safety_distance - east_min
+            right = east + d_east + safety_distance - east_min
             obstacle = [
-                int(np.clip(north - d_north - safety_distance -
-                            north_min, 0, north_size - 1)),
-                int(np.clip(north + d_north + safety_distance -
-                            north_min, 0, north_size - 1)),
-                int(np.clip(east - d_east - safety_distance -
-                            east_min, 0, east_size - 1)),
-                int(np.clip(east + d_east + safety_distance -
-                            east_min, 0, east_size - 1)),
+                int(np.clip(np.floor(bottom), 0, north_size - 1)),
+                int(np.clip(np.ceil(top), 0, north_size - 1)),
+                int(np.clip(np.floor(left), 0, east_size - 1)),
+                int(np.clip(np.ceil(right), 0, east_size - 1)),
             ]
             grid[obstacle[0]:obstacle[1] + 1, obstacle[2]:obstacle[3] + 1] = 1
-
     return grid, int(north_min), int(east_min)
 
 
@@ -74,76 +73,36 @@ class Action(Enum):
         return (self.value[0], self.value[1])
 
 
-def valid_actions(grid, current_node):
+def valid_actions(grid, current_node, current_action=None, move=1):
     """
     Returns a list of valid actions given a grid and current node.
     """
     all_actions = list(Action)
-    valid_actions = []
+    valid_actions_nodes = []
+    n, m = grid.shape[0] - 1, grid.shape[1] - 1
+
+    # To prevent zigzags add a cost to changing action
+    # Move previous action first
+    if (current_action is not None and
+            current_action in all_actions):
+        all_actions.remove(current_action)
+        all_actions = [current_action] + all_actions
 
     for new_action in all_actions:
-        new_node = []
-        add_action = True
-        for i in range(len(current_node)):
-            c = current_node[i]
-            a = new_action.delta[i]
-            gs = grid.shape[i] - 1
-            new_c = c + a
-            if new_c < 0 or new_c > gs:
-                add_action = False
-                #print("dont add cn:%s, i:%s, a:%s, ad:%s, c:%s, gs:%s, new_c:%s" %(
-                #    current_node, i, new_action, a, c, gs, new_c))
-                break
-            new_node.append(new_c)
+        new_x = current_node[0] + new_action.delta[0] * move
+        new_y = current_node[1] + new_action.delta[1] * move
 
-            #print("obstacle in cn:%s, nn:%s, gr:%s, a:%s, ad:%s" %(
-            #     current_node, new_node, grid[new_node[0], new_node[1]],
-            #     new_action, new_action.delta))
-        if add_action:
-            if grid[new_node[0], new_node[1]]:
-                add_action = False
-            else:
-                valid_actions.append(new_action)
-            #print("adding valid action cn:%s, nn:%s, gr:%s, a:%s, ad:%s" %(
-            #     current_node, new_node, grid[new_node[0], new_node[1]],
-            #     new_action, new_action.delta))
+        if (new_x < 0 or new_x > n or
+            new_y < 0 or new_y > m or
+                grid[new_x, new_y]):
+            pass
+        else:
+            valid_actions_nodes.append((new_action, (new_x, new_y)))
 
-    return valid_actions
+    return valid_actions_nodes
 
 
-def valid_actions_check(grid, current_node):
-    """
-    Returns a list of valid actions given a grid and current node.
-    """
-    valid_actions = list(Action)
-    n, m = grid.shape[0] - 1, grid.shape[1] - 1
-    x, y = current_node
-
-    # check if the node is off the grid or
-    # it's an obstacle
-
-    if x - 1 < 0 or grid[x - 1, y] == 1:
-        valid_actions.remove(Action.NORTH)
-    if x + 1 > n or grid[x + 1, y] == 1:
-        valid_actions.remove(Action.SOUTH)
-    if y - 1 < 0 or grid[x, y - 1] == 1:
-        valid_actions.remove(Action.WEST)
-    if y + 1 > m or grid[x, y + 1] == 1:
-        valid_actions.remove(Action.EAST)
-
-    if (x - 1 < 0 or y - 1 < 0) or grid[x - 1, y - 1] == 1:
-        valid_actions.remove(Action.NORTH_WEST)
-    if (x - 1 < 0 or y + 1 > m) or grid[x - 1, y + 1] == 1:
-        valid_actions.remove(Action.NORTH_EAST)
-    if (x + 1 > n or y - 1 < 0) or grid[x + 1, y - 1] == 1:
-        valid_actions.remove(Action.SOUTH_WEST)
-    if (x + 1 > n or y + 1 > m) or grid[x + 1, y + 1] == 1:
-        valid_actions.remove(Action.SOUTH_EAST)
-
-    return valid_actions
-
-
-def a_star(grid, h, start, goal):
+def a_star(grid, h, start, goal, max_move=1):
     path = []
     path_cost = 0
     queue = PriorityQueue()
@@ -156,12 +115,15 @@ def a_star(grid, h, start, goal):
     # To give information about the planning process
     depth = 0
     depth_act = 0
-    report_int = 2
+    report_int = 1024
 
     t0 = time.time()
     while not queue.empty():
         item = queue.get()
         current_node = item[1]
+        current_q_cost = item[0]
+
+        move = max_move
 
         if current_node in visited:
             continue
@@ -172,36 +134,38 @@ def a_star(grid, h, start, goal):
         if current_node == start:
             current_cost = 0.0
             current_action = None
-            action_change_cost = 0.0
         else:
             current_cost = branch[current_node][0]
             current_action = branch[current_node][2]
-
         if depth % report_int == 0:
-            print("#Nodes:%s, #Actions:%s, Cost:%.2f, Currenct Node:%s, Time:%.2f" %(
-                depth, depth_act, current_cost, current_node, time.time() - t0))
+            print("#Nodes:%s, #Actions:%s, Cost:%.2f, Currenct Node:%s,"
+                  " Time:%.2f" % (depth, depth_act, current_cost,
+                                  current_node, time.time() - t0))
             report_int *= 2
+
+        current_h_cost = current_q_cost - current_cost
+
+        if current_h_cost < np.sqrt(2) * float(max_move):
+            move = 1
+        else:
+            move = max_move
+
         if current_node == goal:
             print('Found a path.')
             found = True
-            print("#Nodes:%s, #Actions:%s, Cost:%.2f, Currenct Node:%s, Time:%.2f" %(
-                depth, depth_act, current_cost, current_node, time.time() - t0))
+            print("#Nodes:%s, #Actions:%s, Cost:%.2f, Currenct Node:%s,"
+                  " Time:%.2f" % (depth, depth_act, current_cost,
+                                  current_node, time.time() - t0))
             break
         else:
-            for action in valid_actions(grid, current_node):
+            val_act_nod = valid_actions(
+                grid, current_node, current_action, move)
+            for action, next_node in val_act_nod:
+
                 depth_act += 1
-                # get the tuple representation
-                da = action.delta
-                next_node = (current_node[0] + da[0],
-                             current_node[1] + da[1]
-                             )
-                # To prevent zigzags add a cost to changing action
-                # If this cost is larger,
-                # it prevents A* from planning correctly
-                if current_action is not None:
-                    action_change_cost = heuristic(
-                        da, current_action.delta) / 100.0
-                branch_cost = current_cost + action.cost + action_change_cost
+
+                action_cost = action.cost * move
+                branch_cost = current_cost + action_cost
                 h_cost = h(next_node, goal)
                 queue_cost = branch_cost + h_cost
                 if next_node in branch:
