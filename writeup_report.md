@@ -20,6 +20,11 @@ lla:  37.7914857 -122.3921666 0.082 ```(self._latitude, self._longitude, self._a
 
 GIT LOG
 
+TODO
+Action change cost effect on planning time
+mention when move = 3
+nearly %50 more time 77.57 sec to  49.38 sec
+Then select pre action first
 
 
 # Required Steps for a Passing Submission:
@@ -102,7 +107,6 @@ There are TODO algorithms implemented. These are
 
 To run 2D grid A* planning, there are two options. One is to run the motion_planning.py file. The possible parameters are global_goal, local_goal, grid_goal. If more than one arguments are sent, only the first one would have affect. The other option is the motionplot.ipnyb notebook.
 
-There is problem with path planning, if it takes too much time, it can't send the waypoints to the simulator.
 
 #### 1. Set your global home position
 The plan_path method reads the colliders.csv file and gets the lat0 and lon0 values. Convert these values to float, and send them to the self.set_home_position function. This function sets the global home position.
@@ -129,7 +133,15 @@ For 2D planning, the action object in the planning_utils.py file includes 4 addi
 
 In the first version of the a_star function in the planning_utils.py file, when a node can be reached with a lower cost after it was added to the branch, it is not possible to change the path for that node. In order to correct this error, the code location to add a node to the visited list is changed. A node is added to the visited list, only when it is the current node. Previously, it was added when it was the next_node. This change enabled a node to be placed in the queue more than once. It will be visited with the lowest queue cost. After it is visited, the other items in the queue, containing the same node, will be skipped without processing.
 
-Another thing to add was adding a cost for changing action. The reason is to prevent too many zigzag moves. However, this cost shall be significantly lower than the action cost (action cost / 10). Otherwise, it changes the behavior of the a_star planning.
+One problem was timeout. If planning takes too much time, it can't send the waypoints to the simulator. Increasing the timeout parameter of the connection object was not a solution. In that case, the MotionPlanning (Drone) instance and the simulator stuck at the TAKEOFF state.
+
+The solution for this problem, creating a new MotionPlanning instance and sending the waypoints with that instance.
+
+Another problem was zigzag moves. The solution was to first check the previous action. For a new node, if applying the previous action is valid, then first extend to that node. This provide a more prioritized order to that action in the queue.
+
+Another thing to try was adding a cost for changing action. This cost shall be significantly lower than the action cost (action cost / 100). Otherwise, it changes the behavior of the a_star planning. This cost increased the process time by 50%. Therefore, it doesn't present in the current planner.
+
+To increase process speed, number of steps taken with each step was increased. Current planner takes five steps with a single action. If the current node and the goal are closer than 5 * sqrt(2), then it is only possible to move a single step. The parameter to modify the number of steps is max_move in the plan_path method.
 
 #### 6. Cull waypoints
 The collinearity_check was performed to determine whether a point in the path can be removed or not. If three points fit in the same line, then the second of them was removed.
