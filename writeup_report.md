@@ -73,10 +73,10 @@ Currently, the goal position is hardcoded as some location 10 m north and 10 m e
 
 ### Implementing Your Path Planning Algorithm (2D Grid A* algorithm)
   
-There are TODO algorithms implemented. These are
+There are five algorithms implemented. These are
 1. 2D Grid A* Algorithm
 2. 3D Voxmap A* Algorithm
-3. TODO Graph
+3. 2D Graph
 4. Probabilistic Roadmap
 5. RRT
 
