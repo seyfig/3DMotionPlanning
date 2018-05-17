@@ -148,39 +148,42 @@ The collinearity_check was performed to determine whether a point in the path ca
 
 
 ### 3D Grid A* algorithm
+The 3D A* planning is implemented in the motionplot3Dvox notebook.
 
-#### 1. Set your global home position
-Here students should read the first line of the csv file, extract lat0 and lon0 as floating point values and use the self.set_home_position() method to set global home. Explain briefly how you accomplished this in your code.
+There are two different voxel maps. The former, which is the smaller one, has a voxel size of 5, and the latter has 1 voxel size. The main planning runs on the smaller voxel map. Since the voxel representation of the start and the goal points may not correspond to the actual points, the other planning calculates the path from start point to voxel and the path from voxel to goal point on the larger voxel map with voxel size 1. 
 
+To decrease the planning time, the a_star algorithm runs in both ways. From start to goal and from goal to start. In cases such as planning to a hole, this algorithm significantly lowers the computation time. When a node is visited by both of the paths, it is accepted as the midpoint. And the path from start to the midpoint and the path from the midpoint to the goal are combined to represent the complete path.
 
-And here is a lovely picture of our downtown San Francisco environment from above!
-![Map of SF](./misc/map.png)
-
-#### 2. Set your current local position
-Here as long as you successfully determine your local position relative to global home you'll be all set. Explain briefly how you accomplished this in your code.
+### Graph A* algorithm
+The 2D Graph A* planning is implemented in the motionplotgraph notebook. 2D grid A* planning converted to plan from a graph instead of a grid. There is Grid class to store created grid and graph instances.
 
 
-Meanwhile, here's a picture of me flying through the trees!
-![Forest Flying](./misc/in_the_trees.png)
+### Probabilistic Roadmap
+The Probabilistic Roadmap is implemented in the probabilisticroadmap notebook. 2D Graph A* planning converted to create a graph with a probabilistic method. There is GridProbabilistic class to store created grid and graph instances, and the hyper parameters and methods to create a probabilistic graph.
 
-#### 3. Set grid start position from local position
-This is another step in adding flexibility to the start location. As long as it works you're good to go!
 
-#### 4. Set grid goal position from geodetic coords
-This step is to add flexibility to the desired goal location. Should be able to choose any (lat, lon) within the map and have it rendered to a goal location on the grid.
 
-#### 5. Modify A* to include diagonal motion (or replace A* altogether)
-Minimal requirement here is to modify the code in planning_utils() to update the A* implementation to include diagonal motions on the grid that have a cost of sqrt(2), but more creative solutions are welcome. Explain the code you used to accomplish this step.
-
-#### 6. Cull waypoints 
-For this step you can use a collinearity test or ray tracing method like Bresenham. The idea is simply to prune your path of unnecessary waypoints. Explain the code you used to accomplish this step.
-
+### RRT
+The Rapidly-Exploring Random Tree is implemented in the rrt notebook. The probabilistic Roadmap converted to the RRT method. There is GridRRT class to store created grid and graph instances, and the hyper parameters and methods to create a rrt.
 
 ### Execute the flight
-#### 1. Does it work?
-It works!
+#### 1. Sample video for planning to the top of a building  
 
-### Double check that you've met specifications for each of the [rubric](https://review.udacity.com/#!/rubrics/1534/view) points.
+
+[![Path Planning](http://img.youtube.com/vi/5gAs-jm4Tdw/0.jpg)](https://youtu.be/5gAs-jm4Tdw)
+
+
+#### 2. Sample video for planning to a hole inside of a building  
+
+
+[![Path Planning](http://img.youtube.com/vi/WrGPHvKMSIs/0.jpg)](https://youtu.be/WrGPHvKMSIs)
+
+
+#### 3. Sample video for planning over obstacles  
+
+
+[![Path Planning](http://img.youtube.com/vi/PcxGqdvs7L0)](https://youtu.be/PcxGqdvs7L0)
+
 
 # Extra Challenges: Real World Planning
 
