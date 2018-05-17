@@ -1,31 +1,6 @@
 ## Project: 3D Motion Planning
 ![Quad Image](./misc/enroute.png)
 
----
-TODO:STEPS FROM COMMITS
-3D
-VOXEL MAP, action x 24?
-up do not work
-
-TODO
-# Videos
-1. to the hole
-2. ower the buildings
-Grid Start and Goal:  (209, 911, 5) (617, 919, 5)
-Vox Start and Goal:  (41, 182, 1) (123, 183, 1)
-change [0.71447238 0.36429018 0.52004226]
-goal:  (-122.3850218762088, 37.79512860180831, 130.09256609855177)
-lon lat: (37.79248, -122.39745)  vs  (316, 445)
-lla:  37.7914857 -122.3921666 0.082 ```(self._latitude, self._longitude, self._altitude)```
-
-GIT LOG
-
-TODO
-Action change cost effect on planning time
-mention when move = 3
-nearly %50 more time 77.57 sec to  49.38 sec
-Then select pre action first
-
 
 # Required Steps for a Passing Submission:
 1. Load the 2.5D map in the colliders.csv file describing the environment.
@@ -170,19 +145,19 @@ The Rapidly-Exploring Random Tree is implemented in the rrt notebook. The probab
 #### 1. Sample video for planning to the top of a building  
 
 
-[![Path Planning](http://img.youtube.com/vi/5gAs-jm4Tdw/0.jpg)](https://youtu.be/5gAs-jm4Tdw)
+[![3D Motion Planning to top of a building](http://img.youtube.com/vi/5gAs-jm4Tdw/0.jpg)](https://youtu.be/5gAs-jm4Tdw)
 
 
-#### 2. Sample video for planning to a hole inside of a building  
+### 2. Sample video for planning to a hole inside of a building  
 
 
-[![Path Planning](http://img.youtube.com/vi/WrGPHvKMSIs/0.jpg)](https://youtu.be/WrGPHvKMSIs)
+[![3D Motion Planning to a hole inside of a building](http://img.youtube.com/vi/WrGPHvKMSIs/0.jpg)](https://youtu.be/WrGPHvKMSIs)
 
 
-#### 3. Sample video for planning over obstacles  
+### 2. Sample video for planning over obstacles  
 
 
-[![Path Planning](http://img.youtube.com/vi/PcxGqdvs7L0)](https://youtu.be/PcxGqdvs7L0)
+[![3D Motion Planning over obstacles](http://img.youtube.com/vi/PcxGqdvs7L0/0.jpg)](https://youtu.be/PcxGqdvs7L0)
 
 
 # Extra Challenges: Real World Planning

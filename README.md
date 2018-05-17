@@ -17,19 +17,19 @@ View motionplot3Dvox.html
 ### 2. Sample video for planning to the top of a building  
 
 
-[![Path Planning](http://img.youtube.com/vi/5gAs-jm4Tdw/0.jpg)](https://youtu.be/5gAs-jm4Tdw)
+[![3D Motion Planning to top of a building](http://img.youtube.com/vi/5gAs-jm4Tdw/0.jpg)](https://youtu.be/5gAs-jm4Tdw)
 
 
 ### 3. Sample video for planning to a hole inside of a building  
 
 
-[![Path Planning](http://img.youtube.com/vi/WrGPHvKMSIs/0.jpg)](https://youtu.be/WrGPHvKMSIs)
+[![3D Motion Planning to a hole inside of a building](http://img.youtube.com/vi/WrGPHvKMSIs/0.jpg)](https://youtu.be/WrGPHvKMSIs)
 
 
 ### 4. Sample video for planning over obstacles  
 
 
-[![Path Planning](http://img.youtube.com/vi/PcxGqdvs7L0)](https://youtu.be/PcxGqdvs7L0)
+[![3D Motion Planning over obstacles](http://img.youtube.com/vi/PcxGqdvs7L0/0.jpg)](https://youtu.be/PcxGqdvs7L0)
 
 
 ## 2. 2D Grid  
